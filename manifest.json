@@ -1,0 +1,7 @@
+{
+  "name": "todo-task-app",
+  "short_name": "todo-task-app",
+  "description": "todo task operation",
+  "start_url": "/",
+  "display": "standalone"
+}
