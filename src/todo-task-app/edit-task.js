@@ -17,7 +17,7 @@ class EditTask extends PolymerElement {
         }
       </style>
 
-      <paper-dialog id="editTaskDialog" on-iron-overlay-closed="onCancel">
+      <paper-dialog id="editTaskDialog" on-iron-overlay-closed="onEditDialogClose">
         <h2>Edit Task</h2>
         <div id="editTaskAction">
           <paper-input label="Task" value="{{taskData.label}}" id="editTaskInput"></paper-input>
@@ -36,8 +36,16 @@ class EditTask extends PolymerElement {
           </paper-dropdown-menu-light>
         </div>
         <div class="buttons">
-          <paper-button dialog-dismiss on-click="onCancel">Cancel</paper-button>
+          <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm autofocus on-click="onSubmit">Submit</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="deleteTaskDialog" on-iron-overlay-closed="onDeleteDialogClose">
+        <h2>Delete Task</h2>
+        <p>Are you want to delete task?</p>
+        <div class="buttons">
+          <paper-button dialog-dismiss>No</paper-button>
+          <paper-button dialog-confirm autofocus on-click="onClickYes">Yes</paper-button>
         </div>
       </paper-dialog>
     `;
@@ -46,16 +54,25 @@ class EditTask extends PolymerElement {
   static get properties() {
       return {
         taskData: {
-          type: Object,
-          value: {label: "", status: ""}
+          type: Object
         },
         isDialogOpen: {
           type: Boolean,
-          value: false,
           notify: true,
           observer: "_isDialogChanged"
+        },
+        isDeleteDialogOpen: {
+          type: Boolean,
+          notify: true,
+          observer: "_isDeleteDialogChanged"
         }
       };
+  }
+
+  _isDeleteDialogChanged(newValue, oldValue) {
+    if (newValue) {
+      this.$.deleteTaskDialog.open();
+    }
   }
 
   _isDialogChanged(newValue, oldValue) {
@@ -64,12 +81,19 @@ class EditTask extends PolymerElement {
     }
   }
 
-  onCancel() {
+  onDeleteDialogClose() {
+    this.isDeleteDialogOpen = false;
+  }
+
+  onClickYes() {
+    this.dispatchEvent(new CustomEvent('task-deleted', {bubbles: true, composed: true}));
+  }
+
+  onEditDialogClose() {
     this.isDialogOpen = false;
   }
 
   onSubmit() {
-    this.isDialogOpen = false;
     this.dispatchEvent(new CustomEvent('task-changed', {bubbles: true, composed: true}));
   }
 }

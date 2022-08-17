@@ -49,20 +49,22 @@ class TodoTaskApp extends MutableData(PolymerElement) {
               </div>
               <div class="card-actions">
                 <paper-button raised on-click="editDialogOpen">Edit</paper-button>
-                <paper-button raised on-click="deleteTask">Delete</paper-button>
+                <paper-button raised on-click="deleteDialogOpen">Delete</paper-button>
               </div>
             </paper-card>
           </template>
         </div>
       </paper-card>
       
-      <edit-task id="editTask" is-dialog-open="{{isDialogOpen}}" task-data="{{taskEdit}}"></edit-task>
+      <edit-task id="editTask" is-dialog-open="{{isDialogOpen}}" task-data="{{taskEdit}}" is-delete-dialog-open="{{isDeleteDialogOpen}}"></edit-task>
     `;
   }
 
   constructor() {
     super();
     this.isDialogOpen = false;
+    this.isDeleteDialogOpen = false;
+    this.deleteTaskIndex = -1;
   }
 
   static get properties() {
@@ -97,8 +99,10 @@ class TodoTaskApp extends MutableData(PolymerElement) {
   }
 
   deleteTask(e) {
-    let index = e.model.index;
-    this.splice('tasks', index, 1);
+    if (this.deleteTaskIndex !== -1) {
+      this.splice('tasks', this.deleteTaskIndex, 1);
+      this.deleteTaskIndex = -1;
+    }
   }
 
   editDialogOpen(e) {
@@ -107,9 +111,15 @@ class TodoTaskApp extends MutableData(PolymerElement) {
     this.isDialogOpen = true;
   }
 
+  deleteDialogOpen(e) {
+    this.deleteTaskIndex = e.model.index;
+    this.isDeleteDialogOpen = true;
+  }
+
   ready() {
     super.ready();
     this.$.editTask.addEventListener('task-changed', e => {this.editTask(e);});
+    this.$.editTask.addEventListener('task-deleted', e => {this.deleteTask(e);});
     this.$.addTask.addEventListener('task-added', e => {this.addTask(e);});
   }
 }
